@@ -5,11 +5,15 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
+import io.realm.Realm
+import io.realm.Sort
 
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity() {
+
+    val realm = Realm.getDefaultInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +23,12 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             startActivity<EditActivity>()
         }
+
+        //전체 할 일 정보를 가져와서 날짜순으로 내림차순 정렬
+        val realmResult = realm.where<Todo>()
+            .findAll()
+            .sort("date", Sort.DESCENDING)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -35,5 +45,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 }
